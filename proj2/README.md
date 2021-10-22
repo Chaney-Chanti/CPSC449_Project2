@@ -14,7 +14,7 @@ An installation of ruby-foreman, httpie, sqlite3, sqlite-utils, hug, and gunicor
 
 ## Project Description
 
-In this project we are creating two RESTful microservices. One for users, and one for timelines. 
+In this project we are creating two RESTful microservices. One for users, and one for timelines. Only authenticated users may create a post, and only authenticated users may view their home timeline.
 
 ## How to Run the Program
 
