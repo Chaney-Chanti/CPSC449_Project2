@@ -33,7 +33,38 @@ Install the HAProxy and Gunicorn servers by running the following commands:
 4. Once everything has installed, locate the project folder in the terminal. Use the cd command to the project folder.
 
 5. Then run the command:
-    python3 sqlite.py
-    foreman start
+    ### To initialize the database, type:
+        python3 sqlite.py
+    ### To start the gunicorn servers, type:
+        foreman start
+    
+6. The application will run on four different ports (5000, 5100, 5200, 5300). The application can be tested using HTTPie. 
 
-6. The application will run on two different ports. The application can be tested using HTTPie.
+7. Example CURL/HTTPIE Commands to run:
+    ### User_API:
+
+        localhost:5000/getUsers
+        
+        localhost:5000/getPost?postID=3
+
+        http -a Tony:tonypassword GET localhost:5000/post {"userID": 3, "orgPostID": 0, "link": "N/A", "content": "awesome content!"}
+
+        localhost:5000/follow?username=Chaney&followName=Tony
+
+        localhost:5000/register    
+        curl -X POST localhost:5000/register -H'Content-Type:application/json' -d '{"username":"jeff","passW":"jeffpassword","email":"jeff.hwang@gmail.com","bio":"jeffbio"}'
+
+    ### Timelines_API:
+        *All timeline API utilizes query parameters*
+        localhost:5100/user/timeline?username=Chaney
+        localhost:5100/home/timeline?username=Chaney
+        localhost:5100/public/timeline
+ 
+8. Configure 3 timeline services and 1 user service for th 
+
+## Notes About Project:
+    * When inputting, everything is case sensitive
+    * For grading purposes: We have failed to implement
+        1. Timeline display in reverse chronological order
+        2. Two independent databases (We only have one) for each API
+        3. An initialization script for the database (CSV/Schema)

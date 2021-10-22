@@ -1,14 +1,25 @@
+# CPSC 449 - Project 2: Microblog Service
+#
+# Names:
+# Chaney Chantipaporn
+# Nhat Nguyen
+# Tony Nguyen
+#
+# Emails:
+# Chaney.chanti@csu.fullerton.edu
+# Nhatmn2@csu.fullerton.edu
+# Tonyxd14@csu.fullerton.edu
+#
+
 import string
 import textwrap
 import logging
 import sqlite3
-from dataclasses import dataclass
 import hug
 import requests
 import json
-
-
-#Helper function to perform queries
+from dataclasses import dataclass
+# Helper function to perform queries
 def query(sqlStatement, fetch):
     print('RUNNING SQL: ', sqlStatement + '\n')
     conn = sqlite3.connect('microblog.db') 
@@ -22,16 +33,19 @@ def query(sqlStatement, fetch):
     conn.close()
     return result
 
-#Authenticate a user
+# Function to authenticate a user
 def auth(username, password):
     sql = ("SELECT PassW FROM User WHERE Username='" + username +"';")
     query_password = query(sql, 'fetchone')
     if password == query_password[0]:
         return True
-        
-authentication = hug.authentication.basic(auth)
 
-#Helper function to get the userID from a username
+
+
+# Global Variable for authentication
+authentication = hug.authentication.basic(auth)# Global Variable for authentication
+
+# Helper function to get the userID from a username
 def getUserID(username):
     userID = query("SELECT userID FROM User WHERE username='" + username + "';", 'fetchone')
     if(userID):
@@ -39,10 +53,12 @@ def getUserID(username):
     else:
         return
 
+# Helper function to get the postID of a post
 def getPostID(postID):
     post = query("SELECT postID FROM Post WHERE postID='" + str(postID) + "';", 'fetchone')
     return post
 
+# Helper function to check whether a post is a repost
 def isRepost(content):
     postID = query("SELECT postID FROM Post Where content='" + content + "'", 'fetchone') 
     if(postID):
@@ -51,27 +67,28 @@ def isRepost(content):
     else:
         print('Not a repost...')
         return postID
-        return False
     
 # Routes ---------------------------------------------------------------
 
+# Home screen
 @hug.get("/")   
 def home():
     return 'CPSC 449 Microblog API - A prototype API for a microblog service.'
 
+# Get a post
 @hug.get("/getPost", relationship="postID=value")
 def getPost(postID):
     print(postID)
     post = query("SELECT * FROM Post WHERE postID='" + postID + "';", 'fetchone')
     return post
 
-#Get All Users
+# Get all users
 @hug.get("/getUsers")
 def getUsers():
     all_users = query("SELECT * FROM User;", 'fetchall')
     return all_users
 
-#Create a Post
+# Create a Post
 @hug.post("/post", requires=authentication)
 def post(userID, orgPostID, link, content):
         print('Calling Post Endpoint...')
@@ -94,7 +111,7 @@ def post(userID, orgPostID, link, content):
         post = query(sql, 'fetchone')
         return {"new_post": postData}
 
-#Follow a User
+# Follow a User
 @hug.post("/follow", relationship='username=value&followName=value', requires=authentication)
 def follow(username:hug.types.text, followName:hug.types.text):
     #First get the id's of both usernames s
@@ -109,8 +126,7 @@ def follow(username:hug.types.text, followName:hug.types.text):
     followRelationship = query('INSERT INTO Following (influencerID, followerID) VALUES(%i,%i);' %(followID[0], userID[0]), 'fetchone')
     return {"new_followRelationship": followRelationshipData}
 
-
-#Create a user
+# Create a user
 @hug.post("/register")
 def create_user(username, passW, email, bio):
     print('Calling register endpoint...')
@@ -128,7 +144,3 @@ def create_user(username, passW, email, bio):
             "passW": passW,
             "email": email,
             "bio": bio}
-
-
-
-
